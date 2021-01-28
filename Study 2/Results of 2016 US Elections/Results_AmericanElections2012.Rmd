@@ -1,0 +1,213 @@
+---
+title: "Results_Elections"
+author: "Angel V. Jimenez"
+date: "25 July 2019"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+################################################################################################################
+# ADDITIONAL STUDY: DID TRUMP WIN IN THE STATES WITH GREATER ECONOMIC UNCERTEINTY?
+################################################################################################################
+
+## ECONOMIC UNCERTAINTY = COMPOSITE MEASURE
+
+Economic Uncerteinty = (HousingVacancy+AdultsnoWork+Poverty)/3
+
+Data about economic uncerteinty downloaded from the 2016 Distress Comunities Index (http://eig.org/dci/interactive-maps/state-congressional-districts)
+
+Data about election results downloaded from https://www.dailykos.com/stories/2016/11/25/1601042/-Nerd-Alert-This-spreadsheet-contains-every-presidential-election-by-state-from-1828-to-2016
+
+Outcome: WinnerTrump=1, WinnerClinton=0
+```{r}
+elections<-read.csv("C://EcoUncer.csv")
+str(elections)
+head(elections)
+```
+
+
+```{r}
+# Null model
+model0<-glm(WinnerTrump~1,family=binomial(link='logit'),data=elections)
+summary(model0)
+```
+
+
+
+
+```{r}
+# Model 1: Predictor = Economic Uncerteinty = (HousingVacancy+AdultsnoWork+Poverty)/3
+# Economic Uncertainty Model 
+model1<-glm(WinnerTrump ~EcoUncer,family=binomial(link='logit'),data=elections)
+summary(model1) # Economic Uncerteinty positively predicts the victory of Trump
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model1
+(pseudo.R2.model1 <- (model1$null.deviance - model1$deviance)/model1$null.deviance)
+```
+
+```{r}
+# Political Ideology Model (% votes for Republicans in 2012)
+model2<-glm(WinnerTrump ~Repshare2012,family=binomial(link='logit'),data=elections)
+summary(model2)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model2
+(pseudo.R2.model2 <- (model2$null.deviance - model2$deviance)/model2$null.deviance)
+```
+
+```{r}
+#Full Model
+model3<-glm(WinnerTrump ~EcoUncer + Repshare2012,family=binomial(link='logit'),data=elections)
+summary(model3) 
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model3
+(pseudo.R2.model3 <- (model3$null.deviance - model3$deviance)/model3$null.deviance)
+```
+
+
+
+## ECONOMIC UNCERTAINTY = Poverty Rate, Housing Vacancy Rate, Unemployment Rate as separate predictors
+
+```{r}
+# Economic Uncertainty model with economic uncertainty variables introduced separately
+model4<-glm(WinnerTrump ~ HousingVacancy+AdultsnoWrok+Poverty, family=binomial(link='logit'),data=elections)
+summary(model4)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model4
+(pseudo.R2.model4 <- (model4$null.deviance - model4$deviance)/model4$null.deviance)
+```
+
+```{r}
+# Housing Vacancy
+model5<-glm(WinnerTrump ~ HousingVacancy, family=binomial(link='logit'),data=elections)
+summary(model5)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model5
+(pseudo.R2.model5 <- (model5$null.deviance - model5$deviance)/model5$null.deviance)
+```
+
+```{r}
+# Adults without work
+model6<-glm(WinnerTrump ~ AdultsnoWrok, family=binomial(link='logit'),data=elections)
+summary(model6)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model6
+(pseudo.R2.model6 <- (model6$null.deviance - model6$deviance)/model6$null.deviance)
+```
+
+```{r}
+# Poverty
+model7<-glm(WinnerTrump ~ Poverty, family=binomial(link='logit'),data=elections)
+summary(model7)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model7
+(pseudo.R2.model7 <- (model7$null.deviance - model7$deviance)/model7$null.deviance)
+```
+
+
+```{r}
+# Full model with economic uncertainty variables introduced separately
+model8<-glm(WinnerTrump ~ Repshare2012 + HousingVacancy+AdultsnoWrok+Poverty, family=binomial(link='logit'),data=elections)
+summary(model8)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model8
+(pseudo.R2.model8 <- (model8$null.deviance - model8$deviance)/model8$null.deviance)
+```
+
+# Same models but with proportion of voting for trump as outcome variable (Binomial for proportional data)
+## ECONOMIC UNCERTAINTY = COMPOSITE MEASURE
+```{r}
+elections$Trump_Proportion<-elections$Trump/100
+```
+
+```{r}
+# Null model
+model0<-glm(Trump_Proportion~1,family=binomial(link='logit'),data=elections)
+summary(model0)
+```
+
+
+```{r}
+
+# Economic Uncertainty Model 
+model1<-glm(Trump_Proportion ~EcoUncer,family=binomial(link='logit'),data=elections)
+summary(model1) # Economic Uncerteinty positively predicts the victory of Trump
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model1
+(pseudo.R2.model1 <- (model1$null.deviance - model1$deviance)/model1$null.deviance)
+
+```
+
+```{r}
+# Political Ideology Model (% votes for Republicans in 2012)
+model2<-glm(Trump_Proportion ~Repshare2012,family=binomial(link='logit'),data=elections)
+summary(model2)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model2
+(pseudo.R2.model2 <- (model2$null.deviance - model2$deviance)/model2$null.deviance)
+```
+
+```{r}
+#Full Model
+model3<-glm(Trump_Proportion ~EcoUncer + Repshare2012,family=binomial(link='logit'),data=elections)
+summary(model3) 
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model3
+(pseudo.R2.model3 <- (model3$null.deviance - model3$deviance)/model3$null.deviance)
+```
+
+# Same models but with proportion of voting for trump as outcome variable (Binomial for proportional data)
+## ECONOMIC UNCERTAINTY = Poverty Rate, Housing Vacancy Rate, Unemployment Rate as separate predictors
+
+```{r}
+# Economic Uncertainty model with economic uncertainty variables introduced separately
+model4<-glm(Trump_Proportion ~ HousingVacancy+AdultsnoWrok+Poverty, family=binomial(link='logit'),data=elections)
+summary(model4)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model4
+(pseudo.R2.model4 <- (model4$null.deviance - model4$deviance)/model4$null.deviance)
+```
+
+```{r}
+# Housing Vacancy
+model5<-glm(Trump_Proportion ~ HousingVacancy, family=binomial(link='logit'),data=elections)
+summary(model5)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model5
+(pseudo.R2.model5 <- (model5$null.deviance - model5$deviance)/model5$null.deviance)
+```
+
+```{r}
+# Adults without work
+model6<-glm(Trump_Proportion ~ AdultsnoWrok, family=binomial(link='logit'),data=elections)
+summary(model6)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model6
+(pseudo.R2.model6 <- (model6$null.deviance - model6$deviance)/model6$null.deviance)
+```
+
+```{r}
+# Poverty
+model7<-glm(Trump_Proportion ~ Poverty, family=binomial(link='logit'),data=elections)
+summary(model7)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model7
+(pseudo.R2.model7 <- (model7$null.deviance - model7$deviance)/model7$null.deviance)
+```
+
+
+```{r}
+# Full model with economic uncertainty variables introduced separately
+model8<-glm(Trump_Proportion ~ Repshare2012 + HousingVacancy+AdultsnoWrok+Poverty, family=binomial(link='logit'),data=elections)
+summary(model8)
+#https://mgimond.github.io/Stats-in-R/Logistic.html
+# pseudo.R2.model8
+(pseudo.R2.model8 <- (model8$null.deviance - model8$deviance)/model8$null.deviance)
+```
+
+
+

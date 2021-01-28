@@ -1,0 +1,224 @@
+---
+title: "Study2_Trump_Hillary"
+author: "Angel V. Jimenez"
+date: "24 July 2019"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# DATASET (PRE-TEST FOR STUDY 1 FROM KAKKAR AND SIVANATHAN, 2017)
+
+This is the data used by Kakkar and Sivanathan after applying their exclusion criteria. The data can be found here: https://osf.io/5xez4/ 
+```{r}
+# Open dataset
+data<-read.csv("dataset_study2a.csv")
+# Select data for comparing Hillary Clinton with Donald Trump
+Hillary<-data[ which(data$condi=='0'),] 
+# Select data for comparing Donald Trump with Hillary Clinton
+Trump<-data[ which(data$condi=='1'),] 
+```
+
+# DESCRIPTIVE STATISTICS NOT REPORTED BY KAKKAR AND SIVANATHAN (2017)
+
+```{r}
+#Age
+mean(data$age) # M = 37.55
+sd(data$age) # SD = 12.41
+range(data$age) # 18-84
+# Histogram for age
+breaks<-c(15, 25, 35,  45,  55,  65,75,85)
+hist(data$age,
+     main="Histogram for Age",
+     xlab="Age",
+     border="blue",
+     col="green",
+     breaks = breaks,
+     xlim=c(10,90),
+     ylim=c(0,50),
+     prob = FALSE,
+     xaxt ="n")
+axis(side=1, at=seq(15,85, 10), labels=seq(15,85,10))
+
+#Gender
+library(plyr)
+count(data$gender) # 55 male, 65 female (assuming that 1=male, 2=female, not specified in the datafile)
+
+#Political Ideology 
+mean(data$polit_1)
+sd(data$polit_1)
+range(data$polit_1)
+
+
+hist(data$polit_1,
+     main="Histogram for Political Ideology (1=Republican, 7=Democrat)",
+     xlab="Democrat Ideology",
+     border="blue",
+     col="green",
+     xlim=c(1,7),
+     ylim=c(0,30),
+     prob = FALSE)
+```
+# CORRELATION DOMINANCE-PRESTIGE FOR HILLARY CLINTON
+```{r}
+cor(Hillary$dom, Hillary$ptg)
+```
+
+```{r}
+library(ggplot2)
+library(ggExtra)
+
+Hillary_ptg_dom<-ggplot(Hillary, aes(x=dom, y=ptg)) +
+  geom_point()+
+  geom_smooth(method="lm", level=0.89, formula=y~x)+
+  theme(strip.text.x = element_text(color="black", size=20,face="bold" ))+ 
+  ylab("Average Prestige Ratings")+
+  xlab("Average Dominance Ratings")+
+  theme (axis.title.y = element_text(color="black", size=20, face="bold"), axis.title.x = element_text(color="black", size=24, face="bold"))+theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = seq(1, 7, by = 1))+
+  scale_y_continuous(breaks = seq(1, 7, by = 1))+
+  ggtitle("Hillary Clinton")
+
+a<-ggMarginal(Hillary_ptg_dom, type = "histogram")
+
+```
+
+
+
+
+# CORRELATION DOMINANCE-PRESTIGE FOR DONALD TRUMP
+
+```{r}
+cor(Trump$dom, Trump$ptg)
+```
+
+```{r}
+library(ggplot2)
+library(ggExtra)
+
+Trump_ptg_dom<-ggplot(Trump, aes(x=dom, y=ptg)) +
+  geom_point()+
+  geom_smooth(method="lm", level=0.89, formula=y~x)+
+  theme(strip.text.x = element_text(color="black", size=20,face="bold" ))+ 
+  ylab("Average Prestige Ratings")+
+  xlab("Average Dominance Ratings")+
+  theme (axis.title.y = element_text(color="black", size=20, face="bold"), axis.title.x = element_text(color="black", size=24, face="bold"))+theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = seq(1, 7, by = 1))+
+  scale_y_continuous(breaks = seq(1, 7, by = 1))+
+  ggtitle("Donald Trump")
+
+b<-ggMarginal(Trump_ptg_dom, type = "histogram")
+
+```
+
+```{r}
+library(gridExtra)
+grid.arrange(a, b, ncol=2) 
+```
+
+
+# CORRELATION LIBERAL IDEOLOGY- PERCEPTIONS OF HILLARY CLINTON AS PRESTIGIOUS
+
+```{r}
+cor(Hillary$ptg, Hillary$polit_1)
+```
+
+```{r}
+library(ggplot2)
+library(ggExtra)
+
+Hillary_ptg_polit<-ggplot(Hillary, aes(x=polit_1, y=ptg)) +
+  geom_point()+
+  geom_smooth(method="lm", level=0.89, formula=y~x)+
+  theme(strip.text.x = element_text(color="black", size=20,face="bold" ))+ 
+  ylab("Average Prestige Ratings")+
+  xlab("Liberal Ideology")+
+  theme (axis.title.y = element_text(color="black", size=20, face="bold"), axis.title.x = element_text(color="black", size=24, face="bold"))+theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = seq(1, 7, by = 1))+
+  scale_y_continuous(breaks = seq(1, 7, by = 1))+
+  ggtitle("Hillary Clinton")
+
+c<-ggMarginal(Hillary_ptg_polit, type = "histogram")
+
+```
+
+
+# CORRELATION LIBERAL IDEOLOGY - PERCEPTIONS OF DONALD TRUMP AS PRESTIGIOUS
+```{r}
+cor(Trump$ptg, Trump$polit_1)
+```
+```{r}
+library(ggplot2)
+library(ggExtra)
+
+Trump_ptg_polit<-ggplot(Trump, aes(x=polit_1, y=ptg)) +
+  geom_point()+
+  geom_smooth(method="lm", level=0.89, formula=y~x)+
+  theme(strip.text.x = element_text(color="black", size=20,face="bold" ))+ 
+  ylab("Average Prestige Ratings")+
+  xlab("Liberal Ideology")+
+  theme (axis.title.y = element_text(color="black", size=20, face="bold"), axis.title.x = element_text(color="black", size=24, face="bold"))+theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = seq(1, 7, by = 1))+
+  scale_y_continuous(breaks = seq(1, 7, by = 1))+
+  ggtitle("Donald Trump")
+
+d<-ggMarginal(Trump_ptg_polit, type = "histogram")
+
+```
+
+# CORRELATION LIBERAL IDEOLOGY- PERCEPTIONS OF HILLARY CLINTON AS DOMINANT
+
+```{r}
+cor(Hillary$dom, Hillary$polit_1)
+```
+```{r}
+library(ggplot2)
+library(ggExtra)
+
+Hillary_dom_polit<-ggplot(Hillary, aes(x=polit_1, y=dom)) +
+  geom_point()+
+  geom_smooth(method="lm", level=0.89, formula=y~x)+
+  theme(strip.text.x = element_text(color="black", size=20,face="bold" ))+ 
+  ylab("Average Dominance Ratings")+
+  xlab("Liberal Ideology")+
+  theme (axis.title.y = element_text(color="black", size=20, face="bold"), axis.title.x = element_text(color="black", size=24, face="bold"))+theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = seq(1, 7, by = 1))+
+  scale_y_continuous(breaks = seq(1, 7, by = 1))+
+  ggtitle("Hillary Clinton")
+
+e<-ggMarginal(Hillary_dom_polit, type = "histogram")
+
+```
+
+# CORRELATION LIBERAL IDEOLOGY- PERCEPTIONS OF DONALD TRUMP AS DOMINANT
+```{r}
+cor(Trump$dom, Trump$polit_1)
+```
+```{r}
+library(ggplot2)
+library(ggExtra)
+
+Trump_dom_polit<-ggplot(Trump, aes(x=polit_1, y=dom)) +
+  geom_point()+
+  geom_smooth(method="lm", level=0.89, formula=y~x)+
+  theme(strip.text.x = element_text(color="black", size=20,face="bold" ))+ 
+  ylab("Average Dominance Ratings")+
+  xlab("Liberal Ideology")+
+  theme (axis.title.y = element_text(color="black", size=20, face="bold"), axis.title.x = element_text(color="black", size=24, face="bold"))+theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_x_continuous(breaks = seq(1, 7, by = 1))+
+  scale_y_continuous(breaks = seq(1, 7, by = 1))+
+  ggtitle("Donald Trump")
+
+f<-ggMarginal(Trump_dom_polit, type = "histogram")
+
+```
+
+```{r}
+library(gridExtra)
+grid.arrange(c, d, e, f,  ncol=2) 
+```
